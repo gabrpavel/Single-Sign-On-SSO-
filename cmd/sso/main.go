@@ -1,10 +1,13 @@
 package main
 
 import (
-	"Single-Sign-On/internal/config"
-	"Single-Sign-On/internal/lib/logger/handlers/slogpretty"
 	"log/slog"
 	"os"
+	"os/signal"
+	"sso/internal/app"
+	"sso/internal/config"
+	"sso/internal/lib/logger/handlers/slogpretty"
+	"syscall"
 )
 
 const (
@@ -19,9 +22,21 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	log.Info("starting application", slog.String("env", cfg.Env))
-	// TODO: init app
 
-	// TODO: serve gRPC
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
+
+	go application.GRPCSrv.MustRun()
+
+	// Graceful shutdown
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-stop
+	log.Info("application stopping", slog.String("signal", sign.String()))
+
+	application.GRPCSrv.Stop()
+	log.Info("application stopped")
 }
 
 func setupLogger(env string) *slog.Logger {

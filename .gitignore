@@ -24,3 +24,4 @@ go.work
 .idea
 
 config/local.yaml
+storage/sso.db
