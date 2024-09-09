@@ -59,7 +59,7 @@ func configPath() string {
 		return v
 	}
 
-	return "../config/local_tests.yaml"
+	return "../config/local.yaml"
 }
 
 func grpcAddress(cfg *config.Config) string {
