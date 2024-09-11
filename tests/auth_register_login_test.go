@@ -20,8 +20,6 @@ const (
 	passDefaultLen = 10
 )
 
-// TODO: add token fail validation cases
-
 func TestRegisterLogin_Login_HappyPath(t *testing.T) {
 	ctx, st := suite.New(t)
 
