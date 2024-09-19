@@ -51,12 +51,10 @@ func (s *serverAPI) Login(
 			return nil, status.Error(codes.InvalidArgument, "invalid email or password")
 		}
 
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, status.Error(codes.Internal, "failed to login")
 	}
 
-	return &ssov1.LoginResponse{
-		Token: token,
-	}, nil
+	return &ssov1.LoginResponse{Token: token}, nil
 }
 
 func (s *serverAPI) Register(
@@ -76,9 +74,7 @@ func (s *serverAPI) Register(
 		return nil, status.Error(codes.Internal, "failed to register user")
 	}
 
-	return &ssov1.RegisterResponse{
-		UserId: userID,
-	}, nil
+	return &ssov1.RegisterResponse{UserId: userID}, nil
 }
 
 func (s *serverAPI) IsAdmin(
