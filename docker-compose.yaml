@@ -8,3 +8,4 @@ services:
       - .env
     volumes:
       - ./config:/config
+      - ./storage/sso.db:/storage/sso.db
