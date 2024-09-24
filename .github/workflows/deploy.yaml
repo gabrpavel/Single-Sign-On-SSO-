@@ -11,9 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      HOST: gabr@130.193.55.93
-      IP: 130.193.55.93
-      VERSION: 0.0.1
+      HOST: gabr@84.252.137.116
+      IP: 84.252.137.116
+      VERSION: 0.0.2
 
     steps:
       - name: Checkout code
