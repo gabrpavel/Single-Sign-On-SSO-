@@ -1,5 +1,5 @@
 env: "prod"
-storage_path: "/home/gabr/apps/sso/storage/sso.db"
+storage_path: "/storage/sso.db"
 token_ttl: 1h
 grpc:
   port: 44044

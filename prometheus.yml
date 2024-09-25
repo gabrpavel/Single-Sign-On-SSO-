@@ -7,16 +7,16 @@ scrape_configs:
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['prometheus:9090']
+      - targets: ['localhost:9090']
 
   - job_name: 'url-shortener'
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['url-shortener:8081']
+      - targets: ['localhost:8081']
 
   - job_name: 'single-sign-one'
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['sso:8084']
+      - targets: ['localhost:8084']

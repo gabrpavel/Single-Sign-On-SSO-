@@ -11,8 +11,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      HOST: gabr@84.252.137.116
-      IP: 84.252.137.116
+      HOST: gabr@${{ vars.IP }}
+      IP: ${{ vars.IP }}
       VERSION: 0.0.2
 
     steps:
