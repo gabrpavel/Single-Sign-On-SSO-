@@ -1,5 +1,5 @@
 env: "prod"
-storage_path: "/storage/sso.db"
+storage_path: "/storage/storage.db"
 token_ttl: 1h
 grpc:
   port: 44044
