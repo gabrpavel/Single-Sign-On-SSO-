@@ -1,10 +1,24 @@
 services:
   sso:
-    build: .
-    image: kelbri/sso:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kelbri/sso:0.0.3
     ports:
       - "44044:44044"
-    env_file:
-      - .env
     volumes:
-      - ./config:/config
+      - ./config:/app/config
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+        POSTGRES_USER: kelbri
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: sso
+    volumes:
+      - data:/var/lib/postgresql/data
+
+volumes:
+  data:
