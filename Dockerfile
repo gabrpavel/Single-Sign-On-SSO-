@@ -15,4 +15,4 @@ COPY --from=builder /app/sso /app/sso
 COPY ./config ./config
 
 ENTRYPOINT ["/app/sso"]
-CMD ["--config-path=./config/prod.yaml"]
+CMD ["--config=./config/prod.yaml"]

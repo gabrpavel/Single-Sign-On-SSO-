@@ -5,6 +5,7 @@ import (
 	grpcapp "sso/internal/app/grpc"
 	"sso/internal/config"
 	"sso/internal/services/auth"
+	"sso/internal/storage"
 	"sso/internal/storage/sso-db"
 )
 
@@ -17,12 +18,14 @@ func New(
 	cfg *config.Config,
 ) *App {
 
-	storage, err := sso_db.New(cfg)
+	db, err := sso_db.New(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	authService := auth.New(log, storage, storage, storage, cfg.TokenTTL)
+	tokenStorage := storage.NewRedisTokenStore("redis:6379", "", 0)
+
+	authService := auth.New(log, db, db, db, tokenStorage, cfg.TokenTTL)
 	grpcApp := grpcapp.New(log, authService, cfg.GRPC.Port)
 
 	return &App{

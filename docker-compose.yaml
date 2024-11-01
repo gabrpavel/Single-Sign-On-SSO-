@@ -5,11 +5,12 @@ services:
       dockerfile: Dockerfile
     image: kelbri/sso:0.0.3
     ports:
-      - "44044:44044"
+      - "44045:44044"
     volumes:
       - ./config:/app/config
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:15
@@ -20,5 +21,13 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6378:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   data:
+  redis_data:

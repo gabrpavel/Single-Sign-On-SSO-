@@ -8,5 +8,5 @@ database:
   user: "kelbri"
   password: "password"
   dbname: "sso"
-  host: "0.0.0.0"
+  host: "db"
   port: 5432
