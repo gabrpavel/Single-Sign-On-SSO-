@@ -3,9 +3,13 @@ package grpcapp
 import (
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log/slog"
 	"net"
 	authgrpc "sso/internal/grpc/auth"
+	"sso/internal/lib/logger/sl"
+	lib "sso/internal/lib/metrics"
+	"sso/internal/services/metrics"
 )
 
 type App struct {
@@ -19,8 +23,11 @@ func New(
 	authService authgrpc.Auth,
 	port int,
 ) *App {
-	gRPCServer := grpc.NewServer()
+	gRPCServer := grpc.NewServer(
+		grpc.UnaryInterceptor(lib.PrometheusInterceptor),
+	)
 
+	reflection.Register(gRPCServer)
 	authgrpc.Register(gRPCServer, authService)
 
 	return &App{
@@ -43,6 +50,15 @@ func (a *App) Run() error {
 		slog.String("op", op),
 		slog.Int("port", a.port),
 	)
+
+	log.Info("starting metrics server")
+
+	go func() {
+		err := metrics.StartMetricsServer(":9090")
+		if err != nil {
+			log.Error("failed to start metrics server", sl.Err(err))
+		}
+	}()
 
 	log.Info("starting gRPC server")
 

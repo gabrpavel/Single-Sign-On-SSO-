@@ -6,7 +6,7 @@ import (
 	"sso/internal/config"
 	"sso/internal/services/auth"
 	"sso/internal/storage"
-	"sso/internal/storage/sso-db"
+	"sso/internal/storage/sso_db"
 )
 
 type App struct {

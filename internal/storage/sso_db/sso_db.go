@@ -18,7 +18,7 @@ type Storage struct {
 
 // New создает новый экземпляр PostgreSQL.
 func New(config *config.Config) (*Storage, error) {
-	const op = "storage.sso-db.New"
+	const op = "storage.sso_db.New"
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
 		config.Db.Host, config.Db.User, config.Db.Password, config.Db.DBName, config.Db.Port,
@@ -39,7 +39,7 @@ func New(config *config.Config) (*Storage, error) {
 
 // SaveUser сохраняет пользователя в базе данных.
 func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (int64, error) {
-	const op = "storage.sso-db.SaveUser"
+	const op = "storage.sso_db.SaveUser"
 
 	user := models.User{Email: email, PassHash: passHash}
 	result := s.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(&user)
@@ -56,7 +56,7 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 
 // User возвращает пользователя по email.
 func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
-	const op = "storage.sso-db.User"
+	const op = "storage.sso_db.User"
 
 	var user models.User
 	result := s.db.WithContext(ctx).Where("email = ?", email).First(&user)
@@ -71,7 +71,7 @@ func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
 
 // IsAdmin проверяет, является ли пользователь администратором.
 func (s *Storage) IsAdmin(ctx context.Context, userID int64) (bool, error) {
-	const op = "storage.sso-db.IsAdmin"
+	const op = "storage.sso_db.IsAdmin"
 
 	var user models.User
 	result := s.db.WithContext(ctx).Select("is_admin").Where("id = ?", userID).First(&user)
@@ -86,7 +86,7 @@ func (s *Storage) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 
 // App возвращает приложение по его ID.
 func (s *Storage) App(ctx context.Context, id int) (models.App, error) {
-	const op = "storage.sso-db.App"
+	const op = "storage.sso_db.App"
 
 	var app models.App
 	result := s.db.WithContext(ctx).Where("id = ?", id).First(&app)
