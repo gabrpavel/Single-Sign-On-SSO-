@@ -3,9 +3,10 @@ package app
 import (
 	"log/slog"
 	grpcapp "sso/internal/app/grpc"
+	"sso/internal/config"
 	"sso/internal/services/auth"
-	"sso/internal/storage/sqlite"
-	"time"
+	"sso/internal/storage"
+	"sso/internal/storage/sso_db"
 )
 
 type App struct {
@@ -14,17 +15,18 @@ type App struct {
 
 func New(
 	log *slog.Logger,
-	grpcPort int,
-	storagePath string,
-	tokenTTL time.Duration,
+	cfg *config.Config,
 ) *App {
-	storage, err := sqlite.New(storagePath)
+
+	db, err := sso_db.New(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	authService := auth.New(log, storage, storage, storage, tokenTTL)
-	grpcApp := grpcapp.New(log, authService, grpcPort)
+	tokenStorage := storage.NewRedisTokenStore("redis:6379", "", 0)
+
+	authService := auth.New(log, db, db, db, tokenStorage, cfg.TokenTTL)
+	grpcApp := grpcapp.New(log, authService, cfg.GRPC.Port)
 
 	return &App{
 		GRPCSrv: grpcApp,

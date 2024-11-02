@@ -1,7 +1,12 @@
 env: "prod"
-storage_path: "/storage/storage.db"
 token_ttl: 1h
 grpc:
   port: 44044
   timeout: 5s
 migrations_path: "./migrations"
+database:
+  user: "kelbri"
+  password: "password"
+  dbname: "sso"
+  host: "db"
+  port: 5432

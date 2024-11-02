@@ -14,11 +14,12 @@ import (
 )
 
 type Auth struct {
-	log         *slog.Logger
-	usrSaver    UserSaver
-	usrProvider UserProvider
-	appProvider AppProvider
-	tokenTTL    time.Duration
+	log          *slog.Logger
+	usrSaver     UserSaver
+	usrProvider  UserProvider
+	appProvider  AppProvider
+	tokenStorage storage.TokenStorage
+	tokenTTL     time.Duration
 }
 
 type UserSaver interface {
@@ -51,14 +52,16 @@ func New(
 	userSaver UserSaver,
 	userProvider UserProvider,
 	appProvider AppProvider,
+	tokenStorage storage.TokenStorage,
 	tokenTTL time.Duration,
 ) *Auth {
 	return &Auth{
-		usrSaver:    userSaver,
-		usrProvider: userProvider,
-		log:         log,
-		appProvider: appProvider,
-		tokenTTL:    tokenTTL}
+		usrSaver:     userSaver,
+		usrProvider:  userProvider,
+		log:          log,
+		appProvider:  appProvider,
+		tokenStorage: tokenStorage,
+		tokenTTL:     tokenTTL}
 }
 
 // Login checks if user with given credentials exists in the system and returns access token.
@@ -104,10 +107,15 @@ func (a *Auth) Login(
 
 	log.Info("user logged in successfully")
 
-	token, err := jwt.NewToken(user, app, a.tokenTTL)
+	token, err := jwt.NewAuthToken(user, app, a.tokenTTL)
 	if err != nil {
 		a.log.Error("failed to generate token", sl.Err(err))
 
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err := a.tokenStorage.SaveToken(ctx, user.ID, token, a.tokenTTL); err != nil {
+		a.log.Error("failed to save token in Redis", sl.Err(err))
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 

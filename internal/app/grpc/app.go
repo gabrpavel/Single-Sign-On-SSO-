@@ -8,8 +8,8 @@ import (
 	"net"
 	authgrpc "sso/internal/grpc/auth"
 	"sso/internal/lib/logger/sl"
-	"sso/internal/lib/metrics"
-	"sso/internal/metrics"
+	lib "sso/internal/lib/metrics"
+	"sso/internal/services/metrics"
 )
 
 type App struct {
@@ -24,7 +24,8 @@ func New(
 	port int,
 ) *App {
 	gRPCServer := grpc.NewServer(
-		grpc.UnaryInterceptor(lib.PrometheusInterceptor))
+		grpc.UnaryInterceptor(lib.PrometheusInterceptor),
+	)
 
 	reflection.Register(gRPCServer)
 	authgrpc.Register(gRPCServer, authService)
@@ -53,7 +54,7 @@ func (a *App) Run() error {
 	log.Info("starting metrics server")
 
 	go func() {
-		err := metrics.StartMetricsServer(":8084")
+		err := metrics.StartMetricsServer(":9090")
 		if err != nil {
 			log.Error("failed to start metrics server", sl.Err(err))
 		}

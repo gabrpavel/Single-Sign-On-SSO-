@@ -1,22 +1,8 @@
 global:
-  scrape_interval:     5s
-  evaluation_interval: 5s
+  scrape_interval: 4s
 
 scrape_configs:
-  - job_name: 'prometheus'
-    scrape_interval: 5s
-    scrape_timeout: 5s
+  - job_name: "sso"
+    metrics_path: "/metrics"
     static_configs:
-      - targets: ['localhost:9090']
-
-  - job_name: 'url-shortener'
-    scrape_interval: 5s
-    scrape_timeout: 5s
-    static_configs:
-      - targets: ['localhost:8081']
-
-  - job_name: 'single-sign-one'
-    scrape_interval: 5s
-    scrape_timeout: 5s
-    static_configs:
-      - targets: ['localhost:8084']
+      - targets: ["sso:9090"]
