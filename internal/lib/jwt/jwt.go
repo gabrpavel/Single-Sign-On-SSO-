@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"sso/internal/domain/models"
 	"time"
@@ -22,4 +23,42 @@ func NewAuthToken(user models.User, app models.App, duration time.Duration) (str
 	}
 
 	return tokenString, nil
+}
+
+func ParseToken(tokenString string, getSecret func(appID int) (string, error)) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Проверяем, что токен подписан с использованием HMAC
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid token")
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return nil, errors.New("invalid token")
+		}
+
+		// Извлекаем app_id из claims, чтобы получить соответствующий секрет
+		appID, ok := claims["app_id"].(float64) // JWT хранит числа как float64
+		if !ok {
+			return nil, errors.New("invalid token")
+		}
+
+		secret, err := getSecret(int(appID))
+		if err != nil {
+			return nil, err
+		}
+
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
 }

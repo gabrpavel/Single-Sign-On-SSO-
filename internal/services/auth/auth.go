@@ -44,6 +44,7 @@ var (
 	ErrInvalidAppID       = errors.New("invalid app id")
 	ErrUserExists         = errors.New("user already exists")
 	ErrUserNotFound       = errors.New("user not found")
+	ErrInvalidToken       = errors.New("invalid token")
 )
 
 // New returns a new instance of the Auth service.
@@ -181,4 +182,43 @@ func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 	log.Info("checked if user is admin", slog.Bool("is_admin", isAdmin))
 
 	return isAdmin, nil
+}
+
+func (a *Auth) VerifyToken(ctx context.Context, token string) (bool, int64, string, error) {
+	const op = "Auth.VerifyToken"
+
+	log := a.log.With(
+		slog.String("op", op),
+		slog.String("token", token),
+	)
+
+	log.Info("verifying token")
+
+	claims, err := jwt.ParseToken(token, func(appID int) (string, error) {
+		app, err := a.appProvider.App(ctx, appID)
+		if err != nil {
+			return "", err
+		}
+		return app.Secret, nil
+	})
+	if err != nil {
+		log.Warn("invalid token", sl.Err(err))
+		return false, 0, "", fmt.Errorf("%s: %w", op, ErrInvalidToken)
+	}
+
+	userID, ok := claims["uid"].(float64)
+	if !ok {
+		log.Warn("error while parsing token", sl.Err(err))
+		return false, 0, "", fmt.Errorf("%s: %w", op, ErrInvalidToken)
+	}
+
+	email, ok := claims["email"].(string)
+	if !ok {
+		log.Warn("error while parsing token", sl.Err(err))
+		return false, 0, "", fmt.Errorf("%s: %w", op, ErrInvalidToken)
+	}
+
+	log.Info("verifying token", slog.Bool("isValid", true))
+
+	return true, int64(userID), email, nil
 }

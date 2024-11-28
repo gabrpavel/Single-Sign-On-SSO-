@@ -23,7 +23,7 @@ func New(
 		panic(err)
 	}
 
-	tokenStorage := storage.NewRedisTokenStore("redis:6379", "", 0)
+	tokenStorage := storage.NewRedisTokenStore("localhost:6379", "", 0)
 
 	authService := auth.New(log, db, db, db, tokenStorage, cfg.TokenTTL)
 	grpcApp := grpcapp.New(log, authService, cfg.GRPC.Port)

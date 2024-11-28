@@ -21,7 +21,7 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	log.Info("starting application", slog.String("env", cfg.Env))
+	log.Info("starting starting single sign-on service", slog.String("env", cfg.Env))
 
 	application := app.New(log, cfg)
 
